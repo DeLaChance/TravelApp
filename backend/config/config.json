@@ -2,5 +2,9 @@
   "httpServer":  {
     "port": 8180,
     "host": "0.0.0.0"
+  },
+  "data": {
+    "type": "file",
+    "directory": "/var/data/travelapp-server/"
   }
 }

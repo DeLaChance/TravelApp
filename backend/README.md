@@ -7,10 +7,10 @@ A simple CRUD-backend for TravelApp using Node.js
 - Rethinkdb
 
 # Rest API
-GET: /api/destination
-GET: /api/destination/:id
-POST: /api/destination
-DELETE: /api/destination/:id
+GET: /api/user/:userId/destination
+GET: /api/user/:userId/destination/:id
+POST: /api/user/:userId/destination
+DELETE: /api/user/:userId/destination/:id
 
 A travel destination is a JSON looking like this:
 {
@@ -24,9 +24,8 @@ A travel destination is a JSON looking like this:
 
 # Architecture
 adapter/http/ -> http server + routes
-adapter/db/ -> connect to RethinkDB
 public/ -> static files
-config/ -> configuration 
+config/ -> configuration
 services/ -> business logic
 domain/ -> domain objects
 test/ -> unit + integration tests
@@ -35,3 +34,9 @@ test/ -> unit + integration tests
 I took some inspiration from:
 [https://github.com/contentful/the-example-app.nodejs](example_1)
 [https://github.com/rethinkdb/rethinkdb-example-nodejs](example_2)
+
+# TODO-list:
+- Set up file-based database
+- Set up business logic
+- Connect rest api calls to business logic
+- Replace file-based database by real one
