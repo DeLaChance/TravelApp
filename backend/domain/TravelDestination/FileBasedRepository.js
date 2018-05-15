@@ -29,7 +29,9 @@ class FileBasedRepository {
   * @return a (@see Promise) with a new (@see User)
   **/
   persist(user) {
-    return fs.ensureFile(this.directory + user.userId)
+    const fileName = this.directory + user.userId;
+    return fs.ensureFile(fileName)
+      .then(() => fs.writeJson(fileName, user.toJson()))
       .then(() => {
         console.log("FileBasedRepository: created user %s", user.userName);
         return user;

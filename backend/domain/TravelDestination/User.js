@@ -8,6 +8,14 @@ class User {
     this.travelDestinations = travelDestinations;
   }
 
+  toJson() {
+    return {
+      "userName": this.userName,
+      "userId": this.userId,
+      "travelDestinations": this.travelDestinations
+    };
+  }
+
 }
 
 module.exports = User;
