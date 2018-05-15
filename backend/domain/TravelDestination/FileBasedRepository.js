@@ -72,4 +72,4 @@ class FileBasedRepository {
 
 }
 
-module.exports = new FileBasedRepository();
+module.exports = FileBasedRepository;

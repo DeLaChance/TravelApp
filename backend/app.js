@@ -1,5 +1,5 @@
 const config = require('./config/index')
 const httpServer = require('./adapter/http/index')
-const travelDestination = require ('./domain/TravelDestination/FileBasedRepository')
+const { repository } = require ('./domain/TravelDestination/index')
 
 console.log("travelapp-server was started successfully.");
