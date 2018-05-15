@@ -1,23 +1,21 @@
-const TravelDestination = require('./TravelDestination')
-
 class User {
 
-  constructor(userName, userId, travelDestinations) {
+  constructor(userName, userId, travelDestinationIds) {
     this.userName = userName;
     this.userId = userId;
-    this.travelDestinations = travelDestinations;
+    this.travelDestinationIds = travelDestinationIds;
   }
 
   toJson() {
     return {
       "userName": this.userName,
       "userId": this.userId,
-      "travelDestinations": this.travelDestinations
+      "travelDestinationIds": this.travelDestinationIds
     };
   }
 
   static fromJson(userJson) {
-    return new User(userJson['userName'], userJson['userId'], userJson['travelDestinations']);
+    return new User(userJson['userName'], userJson['userId'], userJson['travelDestinationIds']);
   }
 
 }

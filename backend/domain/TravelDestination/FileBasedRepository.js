@@ -6,8 +6,7 @@ const TravelDestination = require('./TravelDestination')
 const User = require('./User')
 
 /**
-* A FileBasedRepository holds the list of travel destinations (@see TravelDestination)
-* for each user (@see User).
+* A FileBasedRepository holds the list of users (@see User).
 *
 * It is a very simple implementation of a CRUD-store, not meant to be scalable or reliable.
 **/
@@ -33,9 +32,11 @@ class FileBasedRepository {
   * @return a (@see Promise) with a new (@see User)
   **/
   persist(user) {
-    const fileName = this.directory + user.userId;
-    return fs.ensureFile(fileName)
-      .then(() => fs.writeJson(fileName, user.toJson()))
+    const directoryName = this.directory + user.userId + "/";
+    const userFileName = directoryName + "user.json";
+    return fs.ensureDir(directoryName)
+      .then(() => fs.ensureFile(userFileName))
+      .then(() => fs.writeJson(userFileName, user.toJson()))
       .then(() => {
         console.log("FileBasedRepository: created user %s", user.userName);
         return user;
@@ -48,15 +49,17 @@ class FileBasedRepository {
   /**
   * Tries to find a user by a given identifier.
   *
+  * @param the user id
+  *
   * @return a (@see Promise) with a (@see Optional). The optional
   * contains the user if it exists and is empty otherwise.
   **/
   tryFindUserById(userId) {
-    const fileName = this.directory + userId;
-    return fs.pathExists(fileName)
+    const userFileName = this.directory + userId + "/user.json";
+    return fs.pathExists(userFileName)
       .then(fileExists => {
         if( fileExists ) {
-          return fs.readJson(fileName);
+          return fs.readJson(userFileName);
         } else {
           return Promise.resolve(null);
         }
@@ -64,7 +67,7 @@ class FileBasedRepository {
       .then(jsonObject => {
         return Optional.ofNullable(jsonObject)
       })
-      .catch(error => console.error("Error while reading file %s due to: %s", fileName, error));
+      .catch(error => console.error("Error while reading file %s due to: %s", userFileName, error));
   }
 
 }
