@@ -16,6 +16,10 @@ class User {
     };
   }
 
+  static fromJson(userJson) {
+    return new User(userJson['userName'], userJson['userId'], userJson['travelDestinations']);
+  }
+
 }
 
 module.exports = User;

@@ -7,6 +7,7 @@ A simple CRUD-backend for TravelApp using Node.js
 - Rethinkdb
 
 # Rest API
+GET: /api/user/:userId
 GET: /api/user/:userId/destination
 GET: /api/user/:userId/destination/:id
 POST: /api/user/:userId/destination
