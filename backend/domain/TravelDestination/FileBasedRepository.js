@@ -18,10 +18,10 @@ class FileBasedRepository {
 
     // Currently the backend only supports a single user
     // TODO: move to business logic layer
-    const localUser = new User('localuser', 'dced84b9-b20e-4cdc-9cc4-1a3e417a36e4', []);
-    this.persist(localUser);
-    //this.tryFindUserById(localUser.userId)
-      //.then(userOptional => userOptional.ifPresent(user => console.log("is present")));
+    const localUser = new User('localuser', 'dced84b9-b20e-4cdc-9cc4-1a3e417a36e4', ['4ccb2177-eded-44de-9b1e-45781bcf6320']);
+    this.persist(localUser)
+      .then(localUser => this.fetchDestinations(localUser.userId))
+      .then(destinationList => destinationList.forEach(destination => console.log(destination.name))); // A sweet reminder: tidy up this method
 
     console.log("FileBasedRepository initialized under directory %s ", this.directory);
   }
@@ -67,7 +67,38 @@ class FileBasedRepository {
       .then(jsonObject => {
         return Optional.ofNullable(jsonObject)
       })
-      .catch(error => console.error("Error while reading file %s due to: %s", userFileName, error));
+      .catch(error => {
+        console.error("Error while reading file %s due to: %s", userFileName, error);
+      });
+  }
+
+  /**
+  * Finds the list of travel destinations (@see TravelDestination) for a given user.
+  *
+  * @param the user id
+  *
+  * @return a (@see Promise) with a (@see List of @see TravelDestination)
+  */
+  fetchDestinations(userId) {
+    const directoryName = this.directory + userId + "/";
+
+    return this.tryFindUserById(userId)
+      .then(userOptional => {
+        if( userOptional.isPresent() ) {
+          return Promise.all(
+            userOptional.get().travelDestinationIds
+              .map(id =>
+                fs.readJson(directoryName + id)
+                  .catch(error => console.error("Error while reading file %s", (directoryName + id)))
+              )
+          );
+        } else {
+          return Promise.reject(format("User {} should exist", userId));
+        }
+      })
+      .then(travelDestinationJsonBlobs => {
+        return travelDestinationJsonBlobs.map(blob => TravelDestination.fromJson(blob));
+      });
   }
 
 }
