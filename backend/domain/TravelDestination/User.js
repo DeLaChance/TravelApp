@@ -6,6 +6,10 @@ class User {
     this.travelDestinationIds = travelDestinationIds;
   }
 
+  addDestination(destinationId) {
+    this.travelDestinationIds.push(destinationId);
+  }
+
   toJson() {
     return {
       "userName": this.userName,

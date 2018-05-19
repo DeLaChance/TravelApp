@@ -10,7 +10,7 @@ A simple CRUD-backend for TravelApp using Node.js
 GET: /api/user/:userId
 GET: /api/user/:userId/destination
 GET: /api/user/:userId/destination/:id
-POST: /api/user/:userId/destination
+POST: /api/user/:userId/destination <- create
 DELETE: /api/user/:userId/destination/:id
 
 A travel destination is a JSON looking like this:
@@ -40,4 +40,4 @@ I took some inspiration from:
 - Set up file-based database
 - Set up business logic
 - Connect rest api calls to business logic
-- Replace file-based database by real one
+- Set up unit tests

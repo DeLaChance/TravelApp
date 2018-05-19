@@ -1,8 +1,10 @@
 const fs = require('fs-extra')
 const Optional = require('optional-js');
+const uuid = require('uuid/v4');
 
 const { config } = require('../../config/index')
 const TravelDestination = require('./TravelDestination')
+const TravelDestinationDto = require('./TravelDestinationDto')
 const User = require('./User')
 
 /**
@@ -18,9 +20,11 @@ class FileBasedRepository {
 
     // Currently the backend only supports a single user
     // TODO: move to business logic layer
+    const travelDestinationDto = new TravelDestinationDto("Lissabon", "Portugal", 1526740833, []);
     const localUser = new User('localuser', 'dced84b9-b20e-4cdc-9cc4-1a3e417a36e4', ['4ccb2177-eded-44de-9b1e-45781bcf6320']);
     this.persist(localUser)
-      .then(localUser => this.fetchDestinations(localUser.userId))
+      .then(localUser => this.addTravelDestination(localUser.userId, travelDestinationDto))
+      .then(newDestination => this.fetchDestinations(localUser.userId))
       .then(destinationList => destinationList.forEach(destination => console.log(destination.name))); // A sweet reminder: tidy up this method
 
     console.log("FileBasedRepository initialized under directory %s ", this.directory);
@@ -65,7 +69,7 @@ class FileBasedRepository {
         }
       })
       .then(jsonObject => {
-        return Optional.ofNullable(jsonObject)
+        return Optional.ofNullable(User.fromJson(jsonObject))
       })
       .catch(error => {
         console.error("Error while reading file %s due to: %s", userFileName, error);
@@ -107,7 +111,7 @@ class FileBasedRepository {
   * Finds a travel destination (@see TravelDestination) by its identifier.
   *
   * @param the travel destination id
-  *
+  * @param the user id
   *
   * @return a (@see Promise) with a (@see Optional of @see TravelDestination).
   */
@@ -126,6 +130,52 @@ class FileBasedRepository {
       .then(travelDestinationJsonBlob => {
         return Optional.ofNullable(TravelDestination.fromJson(travelDestinationJsonBlob));
       });
+  }
+
+  /**
+  * Adds a travel destination (@see TravelDestination) for a user given a dto
+  * (@see TravelDestinationDto)
+  *
+  * @param the user id
+  * @param the travel destination dto
+  *
+  * @return a (@see Promise) with either the updated/added travel destination
+  */
+  addTravelDestination(userId, dto) {
+    const destinationId = uuid();
+    const userDir = this.directory + userId + "/";
+
+    return this.tryFindUserById(userId)
+      .then(userOptional => {
+        if( userOptional.isPresent() ) {
+          const user = userOptional.get();
+          user.addDestination(destinationId);
+
+          return fs.writeJson(userDir + destinationId, TravelDestination.fromDto(destinationId, dto).toJson())
+            .then(() => fs.writeJson(userDir + "user.json", user.toJson()));
+        } else {
+          return Promise.reject(format("User {} does not exist", userId));
+        }
+      })
+      .then(travelDestination => {
+        return travelDestination;
+      })
+      .catch(error => {
+        console.error("Could not add travel destination due to: %s", error);
+      });
+  }
+
+  /**
+  * Removes a travel destination (@see TravelDestination) for a given user.
+  *
+  * @param the user id
+  * @param the destination id
+  *
+  * @return a (@see Promise) that is rejected when the file could not be deleted
+  * and fulfilled when it could.
+  */
+  removeTravelDestination(userId, destinationId) {
+    
   }
 
 }

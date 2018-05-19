@@ -1,3 +1,5 @@
+const TravelDestinationDto = require('./TravelDestinationDto');
+
 class TravelDestination {
 
   constructor(id, name, country, visitTime, photos) {
@@ -21,6 +23,12 @@ class TravelDestination {
   static fromJson(jsonBlob) {
     return new TravelDestination(jsonBlob['id'], jsonBlob['name'], jsonBlob['country']
       , jsonBlob['visitTime'], jsonBlob['photos']);
+  }
+
+  static fromDto(id, dto) {
+    const jsonBlob = dto.toJson();
+    jsonBlob['id'] = id;
+    return TravelDestination.fromJson(jsonBlob);
   }
 
 }
