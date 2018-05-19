@@ -86,18 +86,45 @@ class FileBasedRepository {
       .then(userOptional => {
         if( userOptional.isPresent() ) {
           return Promise.all(
-            userOptional.get().travelDestinationIds
-              .map(id =>
-                fs.readJson(directoryName + id)
-                  .catch(error => console.error("Error while reading file %s", (directoryName + id)))
-              )
+              userOptional.get().travelDestinationIds
+                .map(id => this.tryFetchDestinationById(userId, id)
+                  .then(optional => {
+                    if( optional.isPresent() ) {
+                      return Promise.resolve(optional.get());
+                    } else {
+                      return Promise.reject(format("No such travel destination {}", id));
+                    }
+                  })
+                )
           );
         } else {
           return Promise.reject(format("User {} should exist", userId));
         }
+      });
+  }
+
+  /**
+  * Finds a travel destination (@see TravelDestination) by its identifier.
+  *
+  * @param the travel destination id
+  *
+  *
+  * @return a (@see Promise) with a (@see Optional of @see TravelDestination).
+  */
+  tryFetchDestinationById(userId, destinationId) {
+    const destinationFileName = this.directory + userId + "/" + destinationId;
+
+    return fs.pathExists(destinationFileName)
+      .then(fileExists => {
+        if( fileExists ) {
+          return fs.readJson(destinationFileName)
+            .catch(error => console.error("Error while reading file %s", destinationFileName));
+        } else {
+          return Promise.resolve(null);
+        }
       })
-      .then(travelDestinationJsonBlobs => {
-        return travelDestinationJsonBlobs.map(blob => TravelDestination.fromJson(blob));
+      .then(travelDestinationJsonBlob => {
+        return Optional.ofNullable(TravelDestination.fromJson(travelDestinationJsonBlob));
       });
   }
 
