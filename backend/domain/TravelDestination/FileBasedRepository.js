@@ -1,11 +1,13 @@
 const fs = require('fs-extra')
 const Optional = require('optional-js');
 const uuid = require('uuid/v4');
+const format = require('string-format')
 
 const { config } = require('../../config/index')
 const TravelDestination = require('./TravelDestination')
 const TravelDestinationDto = require('./TravelDestinationDto')
 const User = require('./User')
+const ErrorMessage = require('../../utils/ErrorMessage')
 
 /**
 * A FileBasedRepository holds the list of users (@see User).
@@ -69,10 +71,11 @@ class FileBasedRepository {
         }
       })
       .then(jsonObject => {
-        return Optional.ofNullable(User.fromJson(jsonObject))
+        return Optional.ofNullable(jsonObject).map(User.fromJson);
       })
       .catch(error => {
         console.error("Error while reading file %s due to: %s", userFileName, error);
+        return Promise.reject(ErrorMessage.serverError());
       });
   }
 
@@ -96,13 +99,13 @@ class FileBasedRepository {
                     if( optional.isPresent() ) {
                       return Promise.resolve(optional.get());
                     } else {
-                      return Promise.reject(format("No such travel destination {}", id));
+                      return Promise.reject(new ErrorMessage(404, format("No such travel destination {} for user {}", id, userId)));
                     }
                   })
                 )
           );
         } else {
-          return Promise.reject(format("User {} should exist", userId));
+          return Promise.reject(new ErrorMessage(404, format("User {} should exist", userId)));
         }
       });
   }
@@ -121,14 +124,17 @@ class FileBasedRepository {
     return fs.pathExists(destinationFileName)
       .then(fileExists => {
         if( fileExists ) {
-          return fs.readJson(destinationFileName)
-            .catch(error => console.error("Error while reading file %s", destinationFileName));
+          return fs.readJson(destinationFileName);
         } else {
           return Promise.resolve(null);
         }
       })
       .then(travelDestinationJsonBlob => {
-        return Optional.ofNullable(TravelDestination.fromJson(travelDestinationJsonBlob));
+        return Optional.ofNullable(travelDestinationJsonBlob).map(TravelDestination.fromJson);
+      })
+      .catch(error => {
+          console.error("Error while reading file %s", destinationFileName);
+          return Promise.reject(ErrorCode.serverError());
       });
   }
 
@@ -175,7 +181,7 @@ class FileBasedRepository {
   * and fulfilled when it could.
   */
   removeTravelDestination(userId, destinationId) {
-    
+
   }
 
 }

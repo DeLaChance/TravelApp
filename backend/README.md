@@ -38,6 +38,5 @@ I took some inspiration from:
 
 # TODO-list:
 - Set up file-based database
-- Set up business logic
 - Connect rest api calls to business logic
 - Set up unit tests
