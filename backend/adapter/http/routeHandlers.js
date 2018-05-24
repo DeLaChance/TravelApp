@@ -77,6 +77,19 @@ module.exports.tryAddTravelDestination = (request, response, next) => {
   }
 };
 
+module.exports.tryDeleteUserDestinationById = (request, response, next) => {
+  const userId = request.params['userId'];
+  const destinationId = request.params['destinationId'];
+
+  response.removeTravelDestination(userId, destinationId)
+    .then(() => {
+      response.status(200).end();
+    })
+    .catch(errorMessage => {
+      response.status(errorMessage.code).end(errorMessage.message);
+    });
+};
+
 module.exports.errorHandler = (fn) => {
   return function (request, response, next) {
     try {

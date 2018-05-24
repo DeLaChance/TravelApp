@@ -8,6 +8,7 @@ const {
   tryFetchUserDestinations,
   tryFetchUserDestinationById,
   tryAddTravelDestination,
+  tryDeleteUserDestinationById,
   errorHandler
   } = require('./routeHandlers')
 const bodyParser = require('body-parser')
@@ -22,6 +23,7 @@ httpServer.get('/api/user/:userId/', errorHandler(tryFetchUserById));
 httpServer.get('/api/user/:userId/destination', errorHandler(tryFetchUserDestinations));
 httpServer.get('/api/user/:userId/destination/:destinationId', errorHandler(tryFetchUserDestinationById));
 httpServer.post('/api/user/:userId/destination', errorHandler(tryAddTravelDestination));
+httpServer.delete('/api/user/:userId/destination/:destinationId', errorHandler(tryDeleteUserDestinationById));
 
 var port = config.httpServer.port;
 var host = config.httpServer.host;

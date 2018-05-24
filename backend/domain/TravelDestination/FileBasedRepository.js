@@ -178,11 +178,21 @@ class FileBasedRepository {
   * @param the user id
   * @param the destination id
   *
-  * @return a (@see Promise) that is rejected when the file could not be deleted
+  * @return an empty (@see Promise) that is rejected when the file could not be deleted
   * and fulfilled when it could.
   */
   removeTravelDestination(userId, destinationId) {
+    const destinationFileName = this.directory + userId + "/" + destinationId;
 
+    return fs.pathExists(destinationFileName)
+      .then(fileExists => {
+        if( fileExists ) {
+          return fs.remove(destinationFileName);
+        } else {
+          return Promise.reject(new ErrorCode(404, format("User {} or destination {}" +
+            "does not exist and cannot be deleted.", userId, destinationId)));
+        }
+      });
   }
 
 }
