@@ -37,7 +37,5 @@ I took some inspiration from:
 [https://github.com/rethinkdb/rethinkdb-example-nodejs](example_2)
 
 # TODO-list:
-- Set up file-based database
-- Connect rest api calls to business logic
-- Security, what if userId -> ../../../../etc/password
-- Set up unit tests
+- Set up unit tests (mocha, chai, chai-as-promised)
+- Include login/authentication (Oauth)

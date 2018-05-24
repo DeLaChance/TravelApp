@@ -20,15 +20,6 @@ class FileBasedRepository {
     this.directory = config.data.directory;
     fs.ensureDirSync(this.directory);
 
-    // Currently the backend only supports a single user
-    // TODO: move to business logic layer
-    const travelDestinationDto = new TravelDestinationDto("Lissabon", "Portugal", 1526740833, []);
-    const localUser = new User('localuser', 'dced84b9-b20e-4cdc-9cc4-1a3e417a36e4', ['4ccb2177-eded-44de-9b1e-45781bcf6320']);
-    this.persist(localUser)
-      .then(localUser => this.addTravelDestination(localUser.userId, travelDestinationDto))
-      .then(newDestination => this.fetchDestinations(localUser.userId))
-      .then(destinationList => destinationList.forEach(destination => console.log(destination.name))); // A sweet reminder: tidy up this method
-
     console.log("FileBasedRepository initialized under directory %s ", this.directory);
   }
 
