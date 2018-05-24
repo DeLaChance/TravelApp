@@ -158,16 +158,17 @@ class FileBasedRepository {
           user.addDestination(destinationId);
 
           return fs.writeJson(userDir + destinationId, TravelDestination.fromDto(destinationId, dto).toJson())
-            .then(() => fs.writeJson(userDir + "user.json", user.toJson()));
+            .then(() => fs.writeJson(userDir + "user.json", user.toJson()))
+            .catch(error => {
+              console.error("Could not add travel destination due to: %s", error);
+              return Promise.reject(ErrorCode.serverError());
+            });
         } else {
-          return Promise.reject(format("User {} does not exist", userId));
+          return Promise.reject(new ErrorCode(404, format("User {} does not exist", userId)));
         }
       })
       .then(travelDestination => {
         return travelDestination;
-      })
-      .catch(error => {
-        console.error("Could not add travel destination due to: %s", error);
       });
   }
 

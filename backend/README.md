@@ -39,4 +39,5 @@ I took some inspiration from:
 # TODO-list:
 - Set up file-based database
 - Connect rest api calls to business logic
+- Security, what if userId -> ../../../../etc/password
 - Set up unit tests

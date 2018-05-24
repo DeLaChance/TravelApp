@@ -21,7 +21,11 @@ class ErrorMessage {
   }
 
   static serverError() {
-    return new ServerError(500, "Internal server error")
+    return new ErrorMessage(500, "Internal server error");
+  }
+
+  static invalidPayload() {
+    return new ErrorMessage(400, "Invalid payload.");
   }
 
 }

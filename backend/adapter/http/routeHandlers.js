@@ -1,5 +1,7 @@
 const format = require('string-format')
 
+const ErrorMessage = require('../../utils/ErrorMessage')
+const TravelDestinationDto = require('../../domain/TravelDestination/TravelDestinationDto')
 const { repository } = require('../../domain/TravelDestination/index')
 
 // TODO: add authorization/authentication to this file
@@ -34,8 +36,6 @@ module.exports.tryFetchUserDestinations = (request, response, next) => {
       response.status(200).json(travelDestinations);
     })
     .catch(errorMessage => {
-      console.log(errorMessage);
-      console.log(errorMessage.toJson());
       response.status(errorMessage.code).send(errorMessage.message);
     });
 
@@ -56,4 +56,35 @@ module.exports.tryFetchUserDestinationById = (request, response, next) => {
     .catch(errorMessage => {
       response.status(errorMessage.code).end(errorMessage.message);
     });
+};
+
+module.exports.tryAddTravelDestination = (request, response, next) => {
+  const jsonBlob = request.body;
+  const userId = request.params['userId'];
+
+  if( TravelDestinationDto.isValid(jsonBlob) === true ) {
+    const travelDestinationDto = TravelDestinationDto.fromJson(jsonBlob);
+    repository.addTravelDestination(userId, travelDestinationDto)
+      .then(travelDestination => {
+        response.status(200).json(travelDestination);
+      })
+      .catch(errorMessage => {
+        response.status(errorMessage.code).end(errorMessage.message);
+      });
+  } else {
+    const errorMessage = ErrorMessage.invalidPayload();
+    response.status(errorMessage.code).end(errorMessage.message);
+  }
+};
+
+module.exports.errorHandler = (fn) => {
+  return function (request, response, next) {
+    try {
+      fn(request, response, next);
+    }
+    catch(e) {
+      const errorMessage = ErrorMessage.serverError();
+      response.status(errorMessage.code).send(errorMessage.message);
+    }
+  }
 };
