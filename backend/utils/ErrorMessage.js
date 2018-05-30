@@ -28,6 +28,10 @@ class ErrorMessage {
     return new ErrorMessage(400, "Invalid payload.");
   }
 
+  static alreadyExists() {
+    return new ErrorMessage(409, "Conflict, entity already exists");
+  }
+
 }
 
 module.exports = ErrorMessage;

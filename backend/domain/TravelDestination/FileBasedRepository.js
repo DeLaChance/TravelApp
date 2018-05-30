@@ -16,11 +16,18 @@ const ErrorMessage = require('../../utils/ErrorMessage')
 **/
 class FileBasedRepository {
 
-  constructor() {
-    this.directory = config.data.directory;
+  constructor(directory = config.data.directory) {
+    this.directory = directory;
     fs.ensureDirSync(this.directory);
 
     console.log("FileBasedRepository initialized under directory %s ", this.directory);
+  }
+
+  /**
+  * Clears all files in the repository. This actions irreversible.
+  */
+  clear() {
+    return fs.remove(this.directory);
   }
 
   /**
@@ -31,16 +38,25 @@ class FileBasedRepository {
   persist(user) {
     const directoryName = this.directory + user.userId + "/";
     const userFileName = directoryName + "user.json";
-    return fs.ensureDir(directoryName)
-      .then(() => fs.ensureFile(userFileName))
-      .then(() => fs.writeJson(userFileName, user.toJson()))
-      .then(() => {
-        console.log("FileBasedRepository: created user %s", user.userName);
-        return user;
-      })
-      .catch(error => {
-        console.error("FileBasedRepository: could not create new user, already exists" + error)
+
+    return this.tryFindUserById(user.userId)
+      .then(userOptional => {
+        if( !userOptional.isPresent() ) {
+          return fs.ensureDir(directoryName)
+            .then(() => fs.ensureFile(userFileName))
+            .then(() => fs.writeJson(userFileName, user.toJson()))
+            .then(() => {
+              console.log("FileBasedRepository: created user %s", user.userName);
+              return user;
+            })
+            .catch(error => {
+              return Promise.reject(ErrorMessage.serverError());
+            });
+        } else {
+          return Promise.reject(ErrorMessage.alreadyExists());
+        }
       });
+
   }
 
   /**
