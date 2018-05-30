@@ -1,7 +1,5 @@
-const chai = require('chai');
-const chaiAsPromised = require("chai-as-promised");
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+const common = require('../common');
+const expect = common.expect;
 
 const FileBasedRepository = require('../../domain/TravelDestination/FileBasedRepository');
 const User = require('../../domain/TravelDestination/User');
